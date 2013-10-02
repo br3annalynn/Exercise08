@@ -2,6 +2,7 @@
 
 import sys
 import random
+import twitter
 
 def make_chains(corpus):
     """Takes an input text as a string and returns a dictionary of
@@ -48,15 +49,28 @@ def make_text(chains):
 
 def main():
     args = sys.argv
-    script, file_name = args
+    script, file_name1, file_name2 = args
     
-    input_text = open(file_name).read().split()
+    input_text1 = open(file_name1).read().replace(")", " ").replace("(", " ").split()
+    input_text2 = open(file_name2).read().split()
+    input_text = input_text1 + input_text2
 
     chain_dict = make_chains(input_text)
     random_text = make_text(chain_dict)
     
     make_text(chain_dict)
     
+    # print random_text
+
+    api = twitter.Api(
+        consumer_key=' ',
+        consumer_secret=' ', 
+        access_token_key=' ', 
+        access_token_secret=' '
+        )
+
+    api.PostUpdate(random_text)
+
     print random_text
 
 if __name__ == "__main__":
