@@ -16,7 +16,7 @@ def make_chains(corpus):
 
     return markov_dict
 
-def make_text(chains):
+def make_text(chains, length_of_txt, end_punct):
     """Takes a dictionary of markov chains and returns random text
     based off an original text."""
     #makes a like of all keys
@@ -43,35 +43,57 @@ def make_text(chains):
 
         if random_text[-1] == "." or random_text[-1] == "?":
             return random_text
-        elif len(random_text) >= 120:
-            random_text = random_text + "?"
+        elif len(random_text) >= length_of_txt:
+            random_text = random_text + end_punct
             return random_text
+
+def make_statements(chain_dict1, chain_dict2):
+    random_text1 = make_text(chain_dict1, 30, ".")
+    random_text2 = make_text(chain_dict2, 90, "...?")
+    random_text = " ".join((random_text1, random_text2))
+    print random_text
+    post_to_twitter(random_text, chain_dict1, chain_dict2)
+
+  
+
+def post_to_twitter(random_text, chain_dict1, chain_dict2):
+    decision = raw_input("Do you want to post this to Twitter? (y/n): ")
+    if decision == "y":
+
+        api = twitter.Api(
+            consumer_key='',
+            consumer_secret='', 
+            access_token_key='', 
+            access_token_secret=''
+            )
+
+        api.PostUpdate(random_text)
+        make_statements(chain_dict1, chain_dict2)
+        
+
+    elif decision == "n":
+        pass
+        print "Not posted."
+        make_statements(chain_dict1, chain_dict2)
+
+    else:
+        sys.exit(0)
 
 def main():
     args = sys.argv
     script, file_name1, file_name2 = args
     
-    input_text1 = open(file_name1).read().replace(")", " ").replace("(", " ").split()
-    input_text2 = open(file_name2).read().split()
-    input_text = input_text1 + input_text2
+    input_text1 = open(file_name1).read().replace(")", "").replace("(", "").split()
+    input_text2 = open(file_name2).read().replace(")", "").replace("(", "").replace("_", " ").split()
+   
 
-    chain_dict = make_chains(input_text)
-    random_text = make_text(chain_dict)
+    chain_dict1 = make_chains(input_text1)
+    chain_dict2 = make_chains(input_text2)
     
-    make_text(chain_dict)
+    make_statements(chain_dict1, chain_dict2)
     
-    # print random_text
 
-    api = twitter.Api(
-        consumer_key=' ',
-        consumer_secret=' ', 
-        access_token_key=' ', 
-        access_token_secret=' '
-        )
-
-    api.PostUpdate(random_text)
-
-    print random_text
+  
 
 if __name__ == "__main__":
     main()
